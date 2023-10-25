@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+
+<body>
+  <div class="video-container">
+    <div class="video-wrapper">
+      <video id="myVideo" controls autoplay muted></video>
+      <div class="overlay">
+        <span id="newYorkTime">00:00:00</span>
+        <span id="newYorkDate"></span>
+
+        <div id="weatherInfo"></div>
+        <div id="weatherInfo">
+          <div id="temperature"></div>
+          <div id="weatherIcon"></div>
+        </div>
+      </div>
+
+      <div class="overlay2">
+        <div class="countdown-container">
+          <div class="countdown">
+            <div class="countdown-item">
+              <span id="days" class="countdown-value"></span>
+              <span class="countdown-label">Days</span>
+            </div>
+            <div class="countdown-item">
+              <span id="hours" class="countdown-value"></span>
+              <span class="countdown-label">Hours</span>
+            </div>
+            <div class="countdown-item">
+              <span id="minutes" class="countdown-value"></span>
+              <span class="countdown-label">Minutes</span>
+            </div>
+            <div class="countdown-item">
+              <span id="seconds" class="countdown-value"></span>
+              <span class="countdown-label">Seconds</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="overlay-message">
+        <div class="player">
+        </div>  
+        <div class="audio-player">
+          <audio id="myAudio" autoplay >
+            <source src="https://streamingp.shoutcast.com/JamendoLounge?lang=en-US%2cen%3bq%3d0.9" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          <div class="player-controls">
+            <button id="playButton" class="player-button">
+            </button>
+            <button id="pauseButton" class="player-button">
+            </button>
+          </div>
+      </div>
+      
+
+      <script>
+        var myAudio = document.getElementById('myAudio');
+        var playButton = document.getElementById('playButton');
+        var pauseButton = document.getElementById('pauseButton');
+
+        playButton.addEventListener('click', function () {
+          myAudio.play();
+        });
+
+        pauseButton.addEventListener('click', function () {
+          myAudio.pause();
+        });
+
+        const openWeatherAPIKey = '37901e50f48b609adffc4904d0f8b903';
+
+        if (Hls.isSupported()) {
+          var video = document.getElementById('myVideo');
+          video.controls = true;
+          video.autoplay = true;
+          video.muted = true;
+
+          var hls = new Hls({
+            maxBufferSize: 0,
+            maxBufferLength: 10,
+            enableWorker: true,
+            adaptiveMaxCache: 10
+          });
+
+          hls.loadSource('https://cdn3.wowza.com/1/TklSZG5RQTRoaGZr/dGVWVyt0/hls/pc4g5nqz/720/chunklist.m3u8');
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            video.play();
+            video.addEventListener('play', function () {
+              showOverlay();
+            });
+            video.addEventListener('pause', function () {
+              hideOverlay();
+            });
+            updateNewYorkTime(); // Initial call to set the current time
+            setInterval(updateNewYorkTime, 1000); // Update the time every second
+            fetchWeatherData();
+          });
+        }
+
+
+        // Show overlay
+        function showOverlay() {
+          var overlay = document.querySelector('.overlay');
+          overlay.style.display = 'block';
+        }
+
+        // Hide overlay
+        function hideOverlay() {
+          var overlay = document.querySelector('.overlay');
+          overlay.style.display = 'none';
+        }
+
+        // Update overlay with current local time in New York
+        function updateNewYorkTime() {
+          var newYorkTime = document.getElementById('newYorkTime');
+          var newYorkDate = document.getElementById('newYorkDate');
+          var currentTime = new Date().toLocaleTimeString('en-US', {
+            timeZone: 'America/New_York',
+            hour12: false,
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+          });
+          var currentDate = new Date().toLocaleDateString('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    newYorkDate.textContent = currentDate;
+    newYorkTime.textContent = currentTime;
+
+        }
+
+        // Fetch weather data from OpenWeather API
+        function fetchWeatherData() {
+          fetch('https://api.openweathermap.org/data/2.5/weather?q=New%20York&appid=' + openWeatherAPIKey)
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (data) {
+              displayWeatherInfo(data);
+            })
+            .catch(function (error) {
+              console.log('Error fetching weather data:', error);
+            });
+        }
+
+        // Display weather information
+        function displayWeatherInfo(data) {
+          var weatherInfo = document.getElementById('weatherInfo');
+          var temperatureElement = document.getElementById('temperature');
+          var weatherIconElement = document.getElementById('weatherIcon');
+
+          var temperature = Math.round(data.main.temp - 273.15); // Convert temperature to Celsius
+          var weatherDescription = data.weather[0].description;
+          var weatherIcon = data.weather[0].icon;
+
+          // Set temperature
+          temperatureElement.textContent = temperature + '°C';
+
+          // Set weather icon
+          var iconUrl = 'http://openweathermap.org/img/wn/' + weatherIcon + '.png';
+          weatherIconElement.innerHTML = '<img src="' + iconUrl + '" alt="' + weatherDescription + '">';
+
+          // Set weather location
+         // weatherInfo.textContent = 'New York';
+
+          // Add additional styling if needed
+          temperatureElement.style.color = 'white';
+          // weatherIconElement.style.marginRight = '10px';
+          // setInterval(fetchWeatherData, 1000);
+
+        }
+        // Set the target date for New Year's 2023 (month is zero-based)
+        const targetDate = new Date(2024, 0, 1);
+
+        // Update the countdown every second
+        setInterval(updateCountdown, 1000);
+
+        function updateCountdown() {
+          const now = new Date(); // Current date and time
+          const timeDiff = targetDate - now; // Time difference in milliseconds
+
+          // Calculate the remaining days, hours, minutes, and seconds
+          const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+          // Update the countdown elements in the HTML
+          document.getElementById("days").textContent = days;
+          document.getElementById("hours").textContent = hours;
+          document.getElementById("minutes").textContent = minutes;
+          document.getElementById("seconds").textContent = seconds;
+        }
+
+        var audio = document.getElementById('myAudio');
+  var playPauseButton = document.getElementById('PauseButton');
+
+  playPauseButton.addEventListener('click', function () {
+    if (audio.paused) {
+      audio.play();
+      playPauseButton.classList.add('play');
+    } else {
+      audio.pause();
+      playPauseButton.classList.remove('play');
+    }
+  });
+
+  audio.addEventListener('timeupdate', function () {
+    var currentTime = formatTime(audio.currentTime);
+    var duration = formatTime(audio.duration);
+    var currentTimeElement = document.querySelector('.current-time');
+    var durationElement = document.querySelector('.duration');
+
+    currentTimeElement.textContent = currentTime;
+    durationElement.textContent = duration;
+  });
+
+  function formatTime(time) {
+    var minutes = Math.floor(time / 60);
+    var seconds = Math.floor(time % 60);
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+    return minutes + ':' + seconds;
+  }
+      </script>
+
+</body>
+
+</html>

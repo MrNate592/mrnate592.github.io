@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Side-by-Side YouTube Videos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="videos-container">
+    <div class="video-wrapper">
+      <iframe width="650" height="700" src="https://www.youtube.com/embed/4qyZLflp-sI?autoplay=1&mute=1" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <div class="video-wrapper">
+      <iframe width="650" height="700" src="https://www.youtube.com/embed/4yLuA3bPkp4?autoplay=1&mute=1" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+</body>
+</html>
+
+
+<style>
+ /* Reset default padding and margin for the container and the videos */
+body, html {
+  background-color: black;
+  margin: 0;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.videos-container {
+  display: flex; /* Use flexbox to place the videos side by side */
+  justify-content: center;
+}
+
+.video-wrapper {
+  margin: 10px; /* Adjust the margin as needed */
+  position: relative;
+}
+
+.time-overlay {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.video-wrapper iframe {
+  border-radius: 5px;
+}
+
+</style>
