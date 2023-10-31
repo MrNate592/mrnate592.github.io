@@ -15,8 +15,8 @@
 <body>
   <div class="video-container">
     <div class="video-wrapper">
-      <video id="myVideo" controls autoplay muted></video>
-      <div class="overlay">
+      <video id="myVideo"></video>
+      <div class="overlay" style="display: block;">
         <span id="newYorkTime">00:00:00</span>
         <span id="newYorkDate"></span>
 
@@ -51,67 +51,17 @@
       </div>
 
       
-      <div class="overlay-message">
-        <div class="player">
-        </div>  
-        <div class="audio-player">
-          <audio id="myAudio" autoplay >
-            <source src="https://streamingp.shoutcast.com/JamendoLounge?lang=en-US%2cen%3bq%3d0.9" type="audio/mpeg">
-            Your browser does not support the audio element.
-          </audio>
-          <div class="player-controls">
-            <button id="playButton" class="player-button">
-            </button>
-            <button id="pauseButton" class="player-button">
-            </button>
-          </div>
-      </div>
-      
-
+   
       <script>
-        var myAudio = document.getElementById('myAudio');
-        var playButton = document.getElementById('playButton');
-        var pauseButton = document.getElementById('pauseButton');
-
-        playButton.addEventListener('click', function () {
-          myAudio.play();
-        });
-
-        pauseButton.addEventListener('click', function () {
-          myAudio.pause();
-        });
-
+      
         const openWeatherAPIKey = '37901e50f48b609adffc4904d0f8b903';
 
-        if (Hls.isSupported()) {
-          var video = document.getElementById('myVideo');
-          video.controls = true;
-          video.autoplay = true;
-          video.muted = true;
-
-          var hls = new Hls({
-            maxBufferSize: 0,
-            maxBufferLength: 10,
-            enableWorker: true,
-            adaptiveMaxCache: 10
-          });
-
-          hls.loadSource('https://cdn3.wowza.com/1/TklSZG5RQTRoaGZr/dGVWVyt0/hls/pc4g5nqz/720/chunklist.m3u8');
-          hls.attachMedia(video);
-
-          hls.on(Hls.Events.MANIFEST_PARSED, function () {
-            video.play();
-            video.addEventListener('play', function () {
-              showOverlay();
-            });
-            video.addEventListener('pause', function () {
-              hideOverlay();
-            });
+        
             updateNewYorkTime(); // Initial call to set the current time
             setInterval(updateNewYorkTime, 1000); // Update the time every second
             fetchWeatherData();
-          });
-        }
+          
+        
 
 
         // Show overlay
